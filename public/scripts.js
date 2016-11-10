@@ -4,6 +4,7 @@ function getAllPuppies() {
 }
 
 function adoptPuppy(payload) {
+  console.log(JSON.stringify(payload));
   return fetch('/api/puppies', {
     headers: {
       'Content-Type': 'application/json'
@@ -13,14 +14,29 @@ function adoptPuppy(payload) {
   });
 }
 
-function likePuppy() {
+function likePuppy(e) {
   // Implement liking a puppy here.
+  console.log(`/api/puppies/${e}`);
+  return fetch(`/api/puppies/${e}`, {
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    method: 'PUT'
+    // body: JSON.stringify(payload)
+  });
 }
 
-function abandonPuppy() {
+function abandonPuppy(e) {
   // Implement abandoning a puppy here :(
+  console.log(`DELETING - /api/puppies/${e}`);
+  return fetch(`/api/puppies/${e}`, {
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    method: 'DELETE'
+    // body: JSON.stringify(payload)
+  });
 }
-
 
 function renderPuppies(puppies) {
   const $container = $('.adopted-puppies').empty();
@@ -43,6 +59,13 @@ function renderPuppies(puppies) {
       .attr('src', puppies[i].url);
 
     // You should add a button for liking here
+    $newPuppy
+      .find('.likeButton')
+      .attr('name', puppies[i].id)
+
+    $newPuppy
+      .find('.abandonButton')
+      .attr('name', puppies[i].id)
 
     // you should add a button for abandoning here
 
@@ -52,12 +75,19 @@ function renderPuppies(puppies) {
 
 function registerLikeButtonHandler() {
   // implement like button listener here.
+  $(".adopted-puppies").on('click', ".likeButton" , (e) => {
+    likePuppy(e.currentTarget.name);
+    getAllPuppies().then(renderPuppies);
+  })
 }
 
 function registerAbandonButtonHandler() {
   // implement abandon button listener here. :(
+  $(".adopted-puppies").on('click', ".abandonButton" , (e) => {
+    abandonPuppy(e.currentTarget.name);
+    getAllPuppies().then(renderPuppies);
+  })
 }
-
 
 function registerFormHandler() {
   $('form').on('submit', function(e) {
@@ -74,10 +104,9 @@ function registerFormHandler() {
   });
 }
 
-
 $(() => {
   registerFormHandler();
-  registerLikeButtonHandler();
   registerAbandonButtonHandler();
+  registerLikeButtonHandler();
   getAllPuppies().then(renderPuppies);
 });
